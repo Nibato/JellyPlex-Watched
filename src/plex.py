@@ -401,6 +401,7 @@ class Plex:
         ssl_bypass=False,
         session=None,
     ):
+        self.timeout = int(os.getenv("REQUEST_TIMEOUT", 300))
         self.baseurl = baseurl
         self.token = token
         self.username = username
@@ -424,14 +425,14 @@ class Plex:
                     baseurl,
                     token,
                     session=self.session,
-                    timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
+                    timeout=self.timeout,
                 )
             elif self.username and self.password and self.servername:
                 # Login via plex account
                 account = MyPlexAccount(
                     self.username,
                     self.password,
-                    timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
+                    timeout=self.timeout,
                 )
                 plex = account.resource(self.servername).connect()
             else:
@@ -573,7 +574,7 @@ class Plex:
                             self.plex._baseurl,
                             token,
                             session=self.session,
-                            timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
+                            timeout=self.timeout,
                         )
                     else:
                         logger(
