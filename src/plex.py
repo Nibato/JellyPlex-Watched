@@ -1,4 +1,4 @@
-import re, requests, traceback
+import re, requests, traceback, os
 from urllib3.poolmanager import PoolManager
 from math import floor
 
@@ -420,10 +420,19 @@ class Plex:
     def login(self, baseurl, token):
         try:
             if baseurl and token:
-                plex = PlexServer(baseurl, token, session=self.session)
+                plex = PlexServer(
+                    baseurl,
+                    token,
+                    session=self.session,
+                    timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
+                )
             elif self.username and self.password and self.servername:
                 # Login via plex account
-                account = MyPlexAccount(self.username, self.password)
+                account = MyPlexAccount(
+                    self.username,
+                    self.password,
+                    timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
+                )
                 plex = account.resource(self.servername).connect()
             else:
                 raise Exception("No complete plex credentials provided")
@@ -564,6 +573,7 @@ class Plex:
                             self.plex._baseurl,
                             token,
                             session=self.session,
+                            timeout=int(os.getenv("REQUEST_TIMEOUT", 300)),
                         )
                     else:
                         logger(
